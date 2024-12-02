@@ -13,7 +13,7 @@ class AsposePdfTestApplicationTests {
 
     @Test
     void contextLoads() {
-        Document document = new Document("src/test/resources/test.pdf");
+        Document document = new Document("src/main/resources/test.pdf");
 
         TextAbsorber textAbsorber = new TextAbsorber();
 

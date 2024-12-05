@@ -33,6 +33,10 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'com.aspose:aspose-pdf:24.11'
+    implementation 'com.aspose:aspose-ocr:24.8.0'
+    implementation 'net.sourceforge.tess4j:tess4j:5.10.0'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.27'
+    implementation 'org.apache.pdfbox:pdfbox-tools:2.0.27'
 
     testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.projectlombok:lombok'

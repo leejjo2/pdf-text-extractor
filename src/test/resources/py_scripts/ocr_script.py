@@ -16,37 +16,74 @@ def extract_text_from_pdf(pdf_path):
 
     # PDF를 이미지로 변환 (첫 페이지만 사용)
     images = convert_from_path(pdf_path)
-    image = images[0]  # 첫 번째 페이지만 선택
 
-    # OCR 실행을 위한 EasyOCR 설정 (영어)
-    reader = easyocr.Reader(['en'])
-    np_image = np.array(image)  # 이미지를 NumPy 배열로 변환
-    result = reader.readtext(np_image)  # 텍스트 추출
 
-    # 이미지에 텍스트 표시를 위한 객체 생성
-    draw = ImageDraw.Draw(image)
+    # 각 페이지 처리
+    for page_num, image in enumerate(images, start=1):
+        # 이미지를 NumPy 배열로 변환
+        np_image = np.array(image)
 
-    for (bbox, text, confidence) in result:
-        top_left = tuple(bbox[0])
-        bottom_right = tuple(bbox[2])
+        # OCR 실행
+        result = reader.readtext(np_image)
 
-        # 신뢰도가 0.5 이상일 경우만 처리
-        if confidence >= 0.5:
-            draw.rectangle([top_left, bottom_right], outline="red", width=2)
-            draw.text((top_left[0], top_left[1] - 15), text, fill="blue")
+        # 이미지에 그리기 위한 객체 생성
+        draw = ImageDraw.Draw(image)
 
-        print(f"Text: {text}, Confidence: {confidence}")
+        # 텍스트 결과를 페이지별로 저장
+        with open(f'page_{page_num}_results.txt', 'w', encoding='utf-8') as f:
+            for (bbox, text, confidence) in result:
+                # 좌표를 정수형으로 변환
+                bbox = [[int(x), int(y)] for (x, y) in bbox]
 
-    # 이미지에 텍스트 박스가 그려진 결과를 저장
-    image.save('annotated_image.jpg')
-    print("텍스트가 추출된 이미지가 'annotated_image.jpg'에 저장되었습니다.")
+                # 신뢰도가 0.5 이상인 텍스트만 처리
+                if confidence >= 0.5:
+                    # 텍스트 위치에 빨간색 사각형 그리기
+                    draw.rectangle([*bbox[0], *bbox[2]], outline="red", width=2)
+                    # 텍스트를 이미지에 파란색으로 쓰기
+                    # draw.text((bbox[0][0], bbox[0][1] - 15), text, fill="blue")
 
-    # 결과를 텍스트 파일로 저장
-    with open('ocr_result.txt', 'w', encoding='utf-8') as f:
-        for _, text, confidence in result:
-            if confidence >= 0.5:
-                f.write(f"Text: {text}\nConfidence: {confidence}\n\n")
-    print("OCR 결과가 'ocr_result.txt'에 저장되었습니다.")
+                    # 결과를 텍스트 파일에 저장
+                    f.write(f"Text: {text}\n")
+                    f.write(f"Bounding Box: {bbox}\n")
+                    f.write(f"Confidence: {confidence}\n\n")
+
+        # 페이지 결과 이미지를 저장
+        image.save(f'page_{page_num}_result.jpg')
+
+
+
+
+#     image = images[0]  # 첫 번째 페이지만 선택
+#
+#     # OCR 실행을 위한 EasyOCR 설정 (영어)
+#     reader = easyocr.Reader(['en'])
+#     np_image = np.array(image)  # 이미지를 NumPy 배열로 변환
+#     result = reader.readtext(np_image)  # 텍스트 추출
+#
+#     # 이미지에 텍스트 표시를 위한 객체 생성
+#     draw = ImageDraw.Draw(image)
+#
+#     for (bbox, text, confidence) in result:
+#         top_left = tuple(bbox[0])
+#         bottom_right = tuple(bbox[2])
+#
+#         # 신뢰도가 0.5 이상일 경우만 처리
+#         if confidence >= 0.5:
+#             draw.rectangle([top_left, bottom_right], outline="red", width=2)
+#             draw.text((top_left[0], top_left[1] - 15), text, fill="blue")
+#
+#         print(f"Text: {text}, Confidence: {confidence}")
+#
+#     # 이미지에 텍스트 박스가 그려진 결과를 저장
+#     image.save('annotated_image.jpg')
+#     print("텍스트가 추출된 이미지가 'annotated_image.jpg'에 저장되었습니다.")
+#
+#     # 결과를 텍스트 파일로 저장
+#     with open('ocr_result.txt', 'w', encoding='utf-8') as f:
+#         for _, text, confidence in result:
+#             if confidence >= 0.5:
+#                 f.write(f"Text: {text}\nConfidence: {confidence}\n\n")
+#     print("OCR 결과가 'ocr_result.txt'에 저장되었습니다.")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

@@ -17,6 +17,8 @@ def extract_text_from_pdf(pdf_path):
     # PDF를 이미지로 변환 (첫 페이지만 사용)
     images = convert_from_path(pdf_path)
 
+    # EasyOCR 설정
+    reader = easyocr.Reader(['en'])  # 영어만 인식하도록 설정
 
     # 각 페이지 처리
     for page_num, image in enumerate(images, start=1):
